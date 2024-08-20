@@ -31,3 +31,5 @@ jobs:
       root_module_path: terraform/environments/prod
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      GITHUBACTIONS_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
+      TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
