@@ -10,7 +10,7 @@ on:
 env:
   ROOT_MODULE_PATH: ${{ github.event.inputs.destroy-target-path }}
   APPLY_ROLE_ARN: ${{ secrets.GITHUBACTIONS_ROLE }}
-  TFSTATE_BUCKET: ${{ vars.TFSTATE_BUCKET }}
+  TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
 
 permissions:
   id-token: write
