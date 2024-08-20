@@ -12,6 +12,7 @@
           "awslogs-stream-prefix": "main_app"
         }
       },
+      "readonlyRootFilesystem": true,
       "memoryReservation": 512,
       "name": "main_app",
       "portMappings": [
