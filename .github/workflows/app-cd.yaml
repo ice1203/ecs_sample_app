@@ -40,7 +40,6 @@ jobs:
       with:
         scan-type: config
         scan-ref: ${{ env.ApplicationSrcDir}}
-        trivyignores: "${{ env.ApplicationSrcDir}}/.trivyignore"
         exit-code: '1'
         severity: 'CRITICAL,HIGH'
         output: 'trivy-table'
