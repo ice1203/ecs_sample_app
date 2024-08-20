@@ -1,5 +1,5 @@
 region: ap-northeast-1
-cluster: "{{ tfstate `module.frontend-ecs.aws_ecs_cluster.my_cluster.name` }}"
+cluster: sample-prod-frontend-ecs-cluster
 service: sample-prod-frontend-svc
 service_definition: ecs-service-def.json
 task_definition: ecs-task-def.json
