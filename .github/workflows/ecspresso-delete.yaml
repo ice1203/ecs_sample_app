@@ -1,0 +1,51 @@
+name: ecspresso Delete
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete-target-path:
+        type: string
+        required: true
+        description: 'Delete the ecspresso file path'
+      tfstate-bucket-path:
+        type: string
+        required: true
+        description: 'Path in the S3 bucket of the TFSTATE file referenced by ecspresso'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ecspresso-delete:
+    name: 'ecspresso Delete'
+    runs-on: ubuntu-latest
+    env:
+      ECSPRESSO_FILE_PATH: ${{ github.event.inputs.delete-target-path }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ap-northeast-1
+      ASSUME_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
+      TFSTATE_BUCKET: ${{ vars.TFSTATE_BUCKET }}
+      TFSTATE_BUCKET_PATH: ${{ github.event.inputs.tfstate-bucket-path }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set AWS Credential
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.ASSUME_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: "ecspressoのインストール"
+      uses: kayac/ecspresso@v2
+      with:
+        version: v2.3.5
+
+    - name: "ecspressoを使ってECSへのdeleteを実行"
+      run: ecspresso scale --tasks=0 && ecspresso delete --force
+      working-directory: ${{ env.ECSPRESSO_FILE_PATH }}
+      env:
+        IMAGE_TAG: "delete"
+        TFSTATE_BUCKET: ${{ env.TFSTATE_BUCKET }}
+        TFSTATE_BUCKET_PATH: ${{ env.TFSTATE_BUCKET_PATH }}
