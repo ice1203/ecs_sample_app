@@ -61,7 +61,6 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: "ecspressoのインストール"
       uses: kayac/ecspresso@v2
@@ -96,6 +95,6 @@ jobs:
       run: ecspresso deploy --config ecspresso.yml
       working-directory: ${{ env.ecspressoDir }}
       env:
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        IMAGE_TAG: ${{ github.sha }}
         TFSTATE_BUCKET: ${{ env.TFSTATE_BUCKET }}
         TFSTATE_BUCKET_PATH: ${{ env.TFSTATE_BUCKET_PATH }}
