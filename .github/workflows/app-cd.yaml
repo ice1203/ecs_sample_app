@@ -92,17 +92,6 @@ jobs:
       with:
         version: v2.3.5
 
-    - name: Setup environment
-      run: |
-        echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
-        # 環境により変えたい変数を設定
-        if [[ ${{ github.ref }} == 'refs/heads/develop' ]]; then
-          echo "TFSTATE_BUCKET=${{ vars.TFSTATE_BUCKET }}" >> $GITHUB_ENV
-          echo "TFSTATE_BUCKET_PATH=ecs-sample-app/dev" >> $GITHUB_ENV
-        else
-          echo "TFSTATE_BUCKET=${{ vars.TFSTATE_BUCKET }}" >> $GITHUB_ENV
-          echo "TFSTATE_BUCKET_PATH=ecs-sample-app/prod" >> $GITHUB_ENV
-        fi
     - name: ecspresso deploy
       run: ecspresso deploy --config ecspresso.yml
       working-directory: ${{ env.ecspressoDir }}
