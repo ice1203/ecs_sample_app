@@ -1,0 +1,113 @@
+name: 'App CD'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+  workflow_dispatch:
+
+env:
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY_NAME: sample-prod-frontend-repo
+  ASSUME_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
+  TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
+  TFSTATE_BUCKET_PATH: ecs-sample-app/prod
+  ApplicationSrcDir: app/javascript-sample-app
+  ecspressoDir: app
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    name: 'build and push'
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.ASSUME_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Trivy Scan
+      id: trivy-scan
+      uses: aquasecurity/trivy-action@0.24.0
+      with:
+        scan-type: config
+        scan-ref: ${{ env.ApplicationSrcDir}}
+        trivyignores: "${{ env.ApplicationSrcDir}}/.trivyignore"
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+        output: 'trivy-table'
+
+    # ECRへログイン
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # イメージをビルドしてコミットID（ハッシュ）でタグ付け
+    - name: Build, tag, and push image to Amazon ECR
+      working-directory: ${{ env.ApplicationSrcDir }}
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_NAME }}
+        IMAGE_TAG: ${{ github.sha }}
+        ENV_NAME: prod
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: "ecspressoのインストール"
+      uses: kayac/ecspresso@v2
+      with:
+        version: v2.3.5
+
+    - name: ecspresso verify
+      id: ecspresso-verify
+      run: ecspresso verify
+      working-directory: ${{ env.ecspressoDir }}
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+
+  deploy:
+    name: 'Application Deploy'
+    runs-on: ubuntu-22.04
+    needs: [build-and-push]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.ASSUME_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: "ecspressoのインストール"
+      uses: kayac/ecspresso@v2
+      with:
+        version: v2.3.5
+
+    - name: Setup environment
+      run: |
+        echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+        # 環境により変えたい変数を設定
+        if [[ ${{ github.ref }} == 'refs/heads/develop' ]]; then
+          echo "TFSTATE_BUCKET=${{ vars.TFSTATE_BUCKET }}" >> $GITHUB_ENV
+          echo "TFSTATE_BUCKET_PATH=ecs-sample-app/dev" >> $GITHUB_ENV
+        else
+          echo "TFSTATE_BUCKET=${{ vars.TFSTATE_BUCKET }}" >> $GITHUB_ENV
+          echo "TFSTATE_BUCKET_PATH=ecs-sample-app/prod" >> $GITHUB_ENV
+        fi
+    - name: ecspresso deploy
+      run: ecspresso deploy --config ecspresso.yml
+      working-directory: ${{ env.ecspressoDir }}
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        TFSTATE_BUCKET: ${{ env.TFSTATE_BUCKET }}
+        TFSTATE_BUCKET_PATH: ${{ env.TFSTATE_BUCKET_PATH }}
