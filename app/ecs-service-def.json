@@ -19,7 +19,7 @@
     {
       "containerName": "main_app",
       "containerPort": 8080,
-      "targetGroupArn": "{{ tfstate `module.frontend-ecs.aws_lb_target_group.my_alb.arn` }}"
+      "targetGroupArn": "{{ tfstate `module.frontend-ecs.aws_lb_target_group.my_alb_1.arn` }}"
     }
   ],
   "networkConfiguration": {
