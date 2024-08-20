@@ -15,6 +15,12 @@ on:
       AWS_ACCOUNT_ID:
         description: AWS Account ID
         required: true
+      GITHUBACTIONS_ROLE:
+        description: GITHUBACTIONS_ROLE
+        required: true
+      TFSTATE_BUCKET:
+        description: TFSTATE_BUCKET
+        required: true
 
 
 env:
