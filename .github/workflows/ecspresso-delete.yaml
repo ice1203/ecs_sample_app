@@ -26,6 +26,7 @@ jobs:
   ecspresso-delete:
     name: 'ecspresso Delete'
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     env:
       ECSPRESSO_FILE_PATH: ${{ github.event.inputs.delete-target-path }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
