@@ -21,8 +21,7 @@ env:
   ASSUME_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
   TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
   TFSTATE_BUCKET_PATH: ecs-sample-app/prod
-  ApplicationSrcDir: app/javascript-sample-app
-  ecspressoDir: app
+  ApplicationSrcDir: javascript-sample-app
 
 permissions:
   id-token: write
@@ -76,7 +75,6 @@ jobs:
     - name: ecspresso verify
       id: ecspresso-verify
       run: ecspresso verify
-      working-directory: ${{ env.ecspressoDir }}
       env:
         IMAGE_TAG: ${{ github.sha }}
 
@@ -99,7 +97,6 @@ jobs:
 
     - name: ecspresso deploy
       run: ecspresso deploy --config ecspresso.yml
-      working-directory: ${{ env.ecspressoDir }}
       env:
         IMAGE_TAG: ${{ github.sha }}
         TFSTATE_BUCKET: ${{ env.TFSTATE_BUCKET }}
