@@ -6,10 +6,10 @@ FROM node:22 AS builder
 WORKDIR /usr/src/app
 
 # package.jsonとpackage-lock.jsonをコピー
-COPY package*.json ./
+#COPY package*.json ./
 
 # 依存関係をインストール
-RUN npm install --production
+RUN --mount=type=bind,target=. npm install --production
 
 # アプリケーションのソースコードをコピー
 COPY . .
