@@ -7,6 +7,12 @@ on:
     paths:
       - 'javascript-sample-app/**'
   workflow_dispatch:
+defaults:                                         # デフォルトシェル
+  run:
+    shell: bash
+concurrency:                                      # 自動キャンセル
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -59,8 +65,8 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
         ENV_NAME: prod
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" -f ./Dockerfile .
+        docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
     - name: "ecspressoのインストール"
       uses: kayac/ecspresso@v2
