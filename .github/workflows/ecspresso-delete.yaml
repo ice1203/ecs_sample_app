@@ -28,7 +28,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     env:
-      ECSPRESSO_FILE_PATH: ${{ github.event.inputs.delete-target-path }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_REGION: ap-northeast-1
       ASSUME_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
@@ -51,7 +50,6 @@ jobs:
 
     - name: "ecspressoを使ってECSへのdeleteを実行"
       run: ecspresso scale --tasks=0 && ecspresso delete --force
-      working-directory: ${{ env.ECSPRESSO_FILE_PATH }}
       env:
         IMAGE_TAG: "delete"
         TFSTATE_BUCKET: ${{ env.TFSTATE_BUCKET }}
