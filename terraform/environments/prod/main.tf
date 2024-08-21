@@ -3,7 +3,7 @@ locals {
   sys_name = "sample"
   env_name = "prod"
   # ecspressoによるECSサービスデプロイ後にコメントアウトを外して実行
-  # ecs_service_name = "ecs-handson-frontend-ecs-svc"
+  ecs_service_name = "sample-prod-frontend-svc"
 }
 
 module "vpc" {
@@ -55,20 +55,20 @@ module "frontend-ecs" {
   allowed_cidr_blocks     = var.allowed_cidr_blocks
 
 }
-# module "codedeploy" {
-#   source = "../../modules/codedeploy"
+module "codedeploy" {
+  source = "../../modules/codedeploy"
 
-#   sys_name                = local.sys_name
-#   env_name                = local.env_name
-#   subsys_name             = "frontend"
-#   ecs_cluster_name        = module.frontend-ecs.ecs_cluster_name
-#   ecs_service_name        = local.ecs_service_name
-#   prod_listener_arn       = module.frontend-ecs.prod_listener_arn
-#   test_listener_arn       = module.frontend-ecs.test_listener_arn
-#   blue_target_group_name  = module.frontend-ecs.blue_target_group_name
-#   green_target_group_name = module.frontend-ecs.green_target_group_name
+  sys_name                = local.sys_name
+  env_name                = local.env_name
+  subsys_name             = "frontend"
+  ecs_cluster_name        = module.frontend-ecs.ecs_cluster_name
+  ecs_service_name        = local.ecs_service_name
+  prod_listener_arn       = module.frontend-ecs.prod_listener_arn
+  test_listener_arn       = module.frontend-ecs.test_listener_arn
+  blue_target_group_name  = module.frontend-ecs.blue_target_group_name
+  green_target_group_name = module.frontend-ecs.green_target_group_name
 
-# }
+}
 # ecspressoによるECSサービスデプロイ後にコメントアウトを外して実行
 # module "application-autoscaling" {
 #   source = "../../modules/application-autoscaling"
