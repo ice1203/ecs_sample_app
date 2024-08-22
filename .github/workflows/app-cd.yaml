@@ -82,6 +82,8 @@ jobs:
   deploy:
     name: 'Application Deploy'
     runs-on: ubuntu-22.04
+    environment:
+      name: Prod
     timeout-minutes: 15
     needs: [build-and-push]
     steps:
