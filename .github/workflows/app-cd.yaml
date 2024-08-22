@@ -82,7 +82,7 @@ jobs:
   deploy:
     name: 'Application Deploy'
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     needs: [build-and-push]
     steps:
     - uses: actions/checkout@v4
