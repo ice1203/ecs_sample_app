@@ -47,7 +47,7 @@ async function handleRequest(req, res) {
     const requestStartTime = new Date().getMilliseconds();
     const routeMapper = {
         '/': (req, res) => {
-            res.end('OK.');
+            res.end('OK2.');
         },
         '/aws-sdk-call': sdkCall,
         '/outgoing-http-call': outgoingHTTPCall,
