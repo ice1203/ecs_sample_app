@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'javascript-sample-app/**'
+    tags:
+      - 'release*'
   workflow_dispatch:
 defaults:                                         # デフォルトシェル
   run:
