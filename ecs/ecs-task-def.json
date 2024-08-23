@@ -64,7 +64,7 @@
   "pidMode": "",
   "cpu": "256",
   "executionRoleArn": "{{ tfstate `module.frontend-ecs.aws_iam_role.ecs_task_execution_role.arn` }}",
-  "family": "ecs-handson-samplejs",
+  "family": "ecs-sample-app",
   "ipcMode": "",
   "memory": "512",
   "networkMode": "awsvpc",
