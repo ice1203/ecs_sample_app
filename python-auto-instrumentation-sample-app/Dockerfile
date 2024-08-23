@@ -1,25 +1,5 @@
-# ビルドステージ
 ARG PYTHON_VERSION=3.11.3
-FROM python:${PYTHON_VERSION}-slim as build
-
-# 必要なパッケージをインストール
-RUN apt-get update && apt-get install -y \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install -r requirements.txt
-
-# 実行ステージ
-FROM python:${PYTHON_VERSION}-slim as final
+FROM python:${PYTHON_VERSION}-slim as base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -27,6 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
+
+# Uncomment the following line if OTEL_RESOURCE_ATTRIBUTES is not specified in the environment elsewhere
+# ENV OTEL_RESOURCE_ATTRIBUTES='service.name=python-auto-instrumentation-sample-app'
 
 WORKDIR /app
 
@@ -42,12 +25,16 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+# Download dependencies as a separate step to take advantage of Docker's caching.
+# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
+# Leverage a bind mount to requirements.txt to avoid having to copy them into
+# into this layer.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    python -m pip install -r requirements.txt
+
 # Switch to the non-privileged user to run the application.
 USER appuser
-
-# Copy the dependencies from the build stage
-COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=build /usr/local/bin /usr/local/bin
 
 # Copy the source code into the container.
 COPY . .
