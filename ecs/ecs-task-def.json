@@ -35,7 +35,7 @@
       "entryPoint": [],
       "command": [
           "--config",
-          "/etc/ecs/ecs-xray.yaml"
+          "/etc/ecs/ecs-cloudwatch-xray.yaml"
       ],
       "environment": [],
       "environmentFiles": [],
