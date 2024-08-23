@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'javascript-sample-app/**'
+      - 'python-auto-instrumentation-sample-app/**'
     tags:
       - 'release*'
   workflow_dispatch:
