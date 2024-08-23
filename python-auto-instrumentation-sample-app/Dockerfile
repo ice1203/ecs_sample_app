@@ -3,7 +3,7 @@ ARG PYTHON_VERSION=3.11.3
 FROM python:${PYTHON_VERSION}-slim as build
 
 # 必要なパッケージをインストール
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends\
     gcc \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
