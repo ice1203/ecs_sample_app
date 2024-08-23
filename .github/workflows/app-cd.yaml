@@ -23,7 +23,7 @@ env:
   ASSUME_ROLE: ${{ secrets.GITHUBACTIONS_ROLE }}
   TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
   TFSTATE_BUCKET_PATH: ecs-sample-app/prod
-  ApplicationSrcDir: javascript-sample-app
+  ApplicationSrcDir: python-auto-instrumentation-sample-app
 
 permissions:
   id-token: write
