@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'python-auto-instrumentation-sample-app/**'
+      - 'ecs/**'
     tags:
       - 'release*'
   workflow_dispatch:
@@ -24,6 +25,7 @@ env:
   TFSTATE_BUCKET: ${{ secrets.TFSTATE_BUCKET }}
   TFSTATE_BUCKET_PATH: ecs-sample-app/prod
   ApplicationSrcDir: python-auto-instrumentation-sample-app
+  EcspressoConfigDir: ecs
 
 permissions:
   id-token: write
@@ -77,6 +79,7 @@ jobs:
 
     - name: ecspresso verify
       id: ecspresso-verify
+      working-directory: ${{ env.EcspressoConfigDir }}
       run: ecspresso verify
       env:
         IMAGE_TAG: ${{ github.sha }}
@@ -102,6 +105,7 @@ jobs:
         version: v2.3.5
 
     - name: ecspresso deploy
+      working-directory: ${{ env.EcspressoConfigDir }}
       run: ecspresso deploy --config ecspresso.yml
       env:
         IMAGE_TAG: ${{ github.sha }}
